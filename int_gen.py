@@ -1,8 +1,7 @@
 import cechmate
-import numpy as np
-from matplotlib import pyplot
 import phat
 
+import numpy as np
 
 class Int_gen:
     def __init__(self, data, maxdim=None):
@@ -15,7 +14,7 @@ class Int_gen:
         return
     #
 
-    def build(self):
+    def build(self,**kwargs):
         '''
         Apply persistent homology using the combination of Cechmate and PHAT.
 
@@ -44,16 +43,23 @@ class Int_gen:
 
         Inputs: None; but you must instantiate the class with the data matrix first.
 
+        Optional inputs:
+            verbosity: controls amount of print statements. Currently only two levels; 
+                0 : no print statements (default)
+                1 : reports progress along pipeline.
+
         Outputs: None; but the above attributes are stored in the object.
         '''
+
+        verbosity = kwargs.get('verbosity', 0)
 
         # this part loosely follows https://cechmate.scikit-tda.org/notebooks/BasicUsage.html
         rips = cechmate.Rips(maxdim = self.maxdim)
 
-        print('Building complex...')
+        if verbosity>0: print('Building complex...')
         compl = rips.build(self.X)   # TODO: this is the second slowest part
 
-        print('ordering simplices...')
+        if verbosity>0: print('ordering simplices...')
         ordered_simplices = sorted(compl, key=lambda x: (x[1], len(x[0])))
 
         # cast as numpy array for handy array slicing later
@@ -63,19 +69,14 @@ class Int_gen:
         # TODO: This is the bottleneck right now in terms of speed!
         # It's written in python; if there's a C++ version sitting around it could
         # be sped up. The python code doesn't look too crazy...
-        print('Casting to sparse pivot column form...')
+        if verbosity>0: print('Casting to sparse pivot column form...')
         columns = cechmate.solver._simplices_to_sparse_pivot_column(ordered_simplices)
 
-        print('Building boundary matrix...')
+        if verbosity>0: print('Building boundary matrix...')
         b_m = phat.boundary_matrix(columns=columns, representation=phat.representations.sparse_pivot_column)
-        print('Computing persistence pairs...')
+
+        if verbosity>0: print('Computing persistence pairs...')
         pairs = b_m.compute_persistence_pairs() # boundary matrix gets reduced in-place here
-
-    #    dgms = cechmate.solver._process_distances(pairs,ordered_simplices)
-
-        # get largest non-infinite time/radius.
-    #    dgms_cat = np.concatenate(list(dgms.values()))
-    #    dgms_max = dgms_cat[np.logical_not(np.isinf(dgms_cat))].max()
 
 
         #
@@ -96,49 +97,24 @@ class Int_gen:
 
         pp = np.array( list(pairs) ) # cast to numpy array just to get array slicing
 
-        # manually compute lifes; only of interest for ranking birth/death features.
-#        lifes_raw = [ordered_simplices[p1][1] - ordered_simplices[p0][1] for p0,p1 in pp]
-#        lifes_raw = np.array(lifes_raw)
-
-
-        # 1.
-        # just something to lexsort on;
-        # first by homological dimension, then life of feature,
-        # then (if relevant) by "death time" and "birth time"
-#        summary = np.vstack([
-#            pp[:,0],
-#            pp[:,1],
-#            -lifes_raw,
-#        ])
-
         # Find homological dimension of each thing; following the lead of
         # cechmate.solver._process_distances().
         Hi = np.array([len(o_s2[ppi[0]][0])-1 for ppi in pp])
 
         # Pull out simplex information from the processed boundary matrix.
-        print('Identifying generators...')
+        if verbosity>0: print('Identifying generators...')
         sparse_reduced_b_m = {}
-#        long_chains = {}
+
         for j in range(b_m._matrix.get_num_cols()):
             thing = b_m._matrix.get_col(j)
             if len(thing)>0:
                 sparse_reduced_b_m[j] = np.array(thing, dtype=np.int64)
-#                if len(thing)>3:
-#                    long_chains[j] = np.array(thing, dtype=np.int64)
-        #            print([j,thing])
         #
-
-#        summary_order = np.lexsort(summary)
-        # store for later (optional) ordering in visualization. 
-        # features sorted first by death-birth, then death, then birth.
-#        self._persistence_order = np.lexsort(summary)
         
-        print('Putting a bow on everything...')
+        if verbosity>0: print('Putting a bow on everything...')
         topo_features = []
 
-#        for j,ii in enumerate(summary_order):
         for ii,pair in enumerate(pp):
-#            pair = pp[ii]
             idx = pair[1]
             birth = o_s2[pair[0]][1]
             death = o_s2[pair[1]][1]
@@ -186,9 +162,10 @@ class Int_gen:
         self._birth_order = np.argsort(self.births)                     # smallest first
         self._death_order = np.argsort(self.deaths)                     # smallest first
 
-        print('done.')
+        if verbosity>0: print('done.')
         return
     #
+
     def get_order(self,which='persistence'):
         '''
         Convenience function for accessing half-hidden attributes giving orderings 

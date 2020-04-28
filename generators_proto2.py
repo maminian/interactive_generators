@@ -38,10 +38,8 @@ if __name__=="__main__":
 
     # pull in tool and run it
     ig = int_gen.Int_gen(X)
-    ig.build()
+    ig.build(verbosity=1)
     
-    
-
 
     #####
     #
@@ -56,23 +54,8 @@ if __name__=="__main__":
 
     fig,ax = pyplot.subplots(1,2, figsize=(10,5))
 
-
     ax[0].scatter(X[:,0], X[:,1], c=[[0.8,0.8,0.8]], s=20, alpha=0.8, zorder=-100)
 
-#    births,deaths = np.zeros( (2,len(ordered_data)), dtype=float)
-#    his = np.zeros(len(ordered_data), dtype=int)
-#    dim_colors = np.zeros( (len(ordered_data),4), dtype=float)
-#    all_ptr = []
-
-#    for j,od in enumerate(ordered_data):
-#        births[j] = od['birth']
-#        deaths[j] = od['death']
-#        his[j] = od['H_i']
-#        dim_colors[j] = pyplot.cm.tab10(his[j])
-#        all_ptr.append( od['ptr'] )
-#    #
-
-    # last polishes
     dgms_max = 1.05*max(ig.deaths)
     ec_hi = {hi:np.where(ig.H_i==hi)[0] for hi in range(ig.maxdim +1)}
 
