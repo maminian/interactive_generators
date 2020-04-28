@@ -12,3 +12,6 @@ which is "responsible" (aka, a generator). Here the topological features are rep
 * numpy (I'm on version 1.18.3 but earlier versions are probably fine)
 * matplotlib (I'm on version 3.0.3)
 * scikit-tda; specifically Cechmate (version 0.0.8) and PHAT (version ???)
+
+# Getting started
+Just run `mpl_generator_interactivity_ex0.py` in ipython or a jupyter notebook. The main class powering the most up to date version is in `int_gen.py`. The rest of the scripts are my baby steps in building up from the sample code in https://matplotlib.org/3.1.1/users/event_handling.html#object-picking towards the specific functionality I want.
