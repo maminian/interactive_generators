@@ -128,7 +128,7 @@ def onpick(event):
 #
 
 ax[0].set_title('(birth,death) data; click to highlight generator')
-ax[1].set_title('data')
+ax[1].set_title('Original data')
 ax[0].legend(loc='lower right')
 ax[0].set_xlabel('birth')
 ax[0].set_ylabel('death')
