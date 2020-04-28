@@ -21,3 +21,8 @@ $RECYCLE.BIN/
 # =========================
 # Operating System Files
 # =========================
+
+# python temp files
+__pycache__/
+*.pyc
+phat-experiments/
