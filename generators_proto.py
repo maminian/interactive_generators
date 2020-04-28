@@ -1,8 +1,9 @@
 import cechmate
-import numpy as np
 from matplotlib import pyplot
 import phat
 
+
+import numpy as np
 #
 
 np.random.seed(2718281828)
