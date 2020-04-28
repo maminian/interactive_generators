@@ -1,6 +1,3 @@
-from matplotlib import pyplot
-import int_gen
-
 import numpy as np
 #
 
@@ -31,6 +28,8 @@ def noisy_circles(n,ncirc=2, eps=0.1):
 #
 
 if __name__=="__main__":
+    from matplotlib import pyplot
+    import int_gen
 
     # generate data
     X = noisy_circles(80)
