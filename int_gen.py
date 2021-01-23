@@ -7,6 +7,7 @@ class Int_gen:
     def __init__(self, data, maxdim=None):
         self.X = np.array(data, dtype=float)    # TODO: less data mangling 
         if maxdim is None:
+            # at most 2; at least 0
             self.maxdim = max( min( data.shape[1]-1, 2 ), 0)
         else:
             self.maxdim = int(maxdim)
