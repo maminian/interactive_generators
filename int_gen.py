@@ -64,7 +64,7 @@ class Int_gen:
         ordered_simplices = sorted(compl, key=lambda x: (x[1], len(x[0])))
 
         # cast as numpy array for handy array slicing later
-        o_s2 = np.array(ordered_simplices)
+        o_s2 = np.array(ordered_simplices, dtype=object)
 
         #
         # TODO: This is the bottleneck right now in terms of speed!
@@ -156,7 +156,7 @@ class Int_gen:
             self.H_i[j] = d['H_i']
             generator_ptrs.append( d['generator_ptr'] )
         #
-        self.generator_ptrs = np.array(generator_ptrs)
+        self.generator_ptrs = np.array(generator_ptrs, dtype=object)
 
         # create orderings for later use.
         self._persistence_order = np.argsort(self.births - self.deaths) # largest first
